@@ -1,0 +1,105 @@
+(1)создание пользователей
+
+user1 = User.objects.create_user(username = 'UserUser1')
+user2 = User.objects.create_user(username = 'UserUser2')
+
+(2)создание объектов модели Author, связанных с этими пользователями
+
+Author.objects.create(author_user = user1)
+Author.objects.create(author_user = user2)
+
+(3)добавление категорий в Category (Sport(id=1), Taxes(id=2), Healthcare(id=3), Gaming(id=4))
+
+Category.objects.create(name = 'Sport')
+Category.objects.create(name = 'Taxes')
+и тд.
+
+(4-5)создание статей/новостей, присваивание им соответствующих категорий
+
+author1 = Author.objects.get(id = 1)
+author2 = Author.objects.get(id = 2)
+
+1)новость от author1 о спрорте и здоровье
+
+Post.objects.create(author = author1, category_type = 'NW', title = 'Бороться до конца!', text = 'Боксёр из Республики Соединённых Королевств Свазиленда одержал сокрушительную победу, несмотря на травму, полученную ещё в первом раунде, а именно: сломанную челюсть.')
+
+Post.objects.get(id = 1).post_category.add(Category.objects.get(id=1))
+Post.objects.get(id = 1).post_category.add(Category.objects.get(id=3))
+
+2)статья от author2 о вкладе грецких орехов в киберспорт
+
+Post.objects.create(author = author2, category_type = 'AR', title = 'Грецкие орехи и их влияние на успехи киберспортсменов', text = '*какой-то умный текст о положительном влиянии грецких орехов на мозг*')
+
+Post.objects.get(id = 2).post_category.add(Category.objects.get(id=1))
+Post.objects.get(id = 2).post_category.add(Category.objects.get(id=3))
+Post.objects.get(id = 2).post_category.add(Category.objects.get(id=4))
+
+3)статья от author2 о реабилитации злостного неплательщика налогов
+
+Post.objects.create(author = author2, category_type = 'AR', title = 'Выход есть всегда', text = 'Олимпийский чемпион, в отношении которого было возбуждено уголовное дело по причине неуплаты налогов в особо крупных размерах, продал автомобиль, который достался ему в подарок за золото в триатлоне и успешно погасил все свои долги')
+
+Post.objects.get(id = 3).post_category.add(Category.objects.get(id=1))
+Post.objects.get(id = 3).post_category.add(Category.objects.get(id=2))
+
+(6)комментарии
+
+(создадим третьего пользователя, который не будет автором)
+
+user3 = User.objects.create_user(username = 'UserUser3')
+
+1)комментарий одного автора под новостью первого
+Comment.objects.create(comment_post = Post.objects.get(id=1), comment_user=Author.objects.get(id = 2).author_user, text = 'lmao'))
+
+2)комментарии не-автора под новостью и статьями
+Comment.objects.create(comment_post = Post.objects.get(id=1), comment_user=User.objects.get(id = 3), text = 'gg')
+Comment.objects.create(comment_post = Post.objects.get(id=2), comment_user=User.objects.get(id = 3), text = 'xdxd')
+Comment.objects.create(comment_post = Post.objects.get(id=2), comment_user=User.objects.get(id = 3), text = '$$$$$')
+Comment.objects.create(comment_post = Post.objects.get(id=3), comment_user=User.objects.get(id = 3), text = '0.0')
+
+(8) повышение/понижения рейтинга статей/новостей и комментариев
+Post.objects.get(id=1).like() (n-ое количество раз)
+Post.objects.get(id=1).dislike() (n-ое количество раз)
+аналогично с id двух других статей
+
+получения рейтинга публикации
+Post.objects.get(id=1).rating
+
+Comment.objects.get(id=1).like() (n-ое количество раз)
+Comment.objects.get(id=1).dislike() (n-ое количество раз)
+аналогично с id других комментариев
+
+Получение рейтинга комментария
+Comment.objects.get(id=1).rating
+
+(8)обновление рейтингов авторов
+
+Author.objects.get(id=1).update_rating()
+
+(9)вывод лучшего автора
+
+Author.objects.ordered_by('-rating_author')[:1]
+
+(10) лучшая статья
+
+a = Post.objects.ordered_by('-rating')[:1]
+
+for i in a:
+	i.date
+	i.author.author_user.username
+	i.rating
+	i.title
+	i.text
+
+
+(11)Получение всего, что можно к конкретной статье 1-3, кроме коментариев к конкретной статье
+
+print(f'({Post.objects.get(id=1).date},{Post.objects.get(id=1).author.author_user},{Post.objects.get(id=1).author.rating_author},{Post.objects.get(id=1).text})')
+
+
+print(f'({Post.objects.get(id=2).date},{Post.objects.get(id=2).author.author_user},{Post.objects.get(id=2).author.rating_author},{Post.objects.get(id=2).text})')
+
+print(f'({Post.objects.get(id=3).date},{Post.objects.get(id=3).author.author_user},{Post.objects.get(id=3).author.rating_author},{Post.objects.get(id=3).text})')
+
+можно получить все комментарии
+
+print([e.text for e in Comment.objects.all()])
