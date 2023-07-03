@@ -16,11 +16,9 @@ class Author(models.Model):
         current_post_comment_rate = 0
         current_post_comment_rate += author_comment_rate.get('comment_rating')
 
-        post_comment_rate = self.comment_user.comment_set.aggregate(post_comment_rating=Sum('rating'))
-        current_post_comment_rate = 0
-        current_post_comment_rate += post_comment_rate.get('post_comment_rating')
+        post_comments_rate = Comment.objects.filter(comment_user = self.author).aggregate(post_rating=Sum('rating'))['post_rating']
 
-        self.rating_author = current_post_rate * 3 + current_post_comment_rate + current_post_comment_rate
+        self.rating_author = current_post_rate * 3 + current_post_comment_rate + post_comment_rate
         self.save()
 
 
